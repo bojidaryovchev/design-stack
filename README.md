@@ -212,7 +212,9 @@ Mixed licensing, documented per-source in [NOTICE](NOTICE).
 | `.claude/skills/impeccable/` | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 |
 | `.claude/skills/{emil-design-eng, review-animations, improve-animations, animation-vocabulary}/` | [emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
 | `reference/marketing-rules.md` (derived) | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | MIT |
-| `design-arbiter/SKILL.md`, `conflicts.md`, `CLAUDE.md`, this README | original | see repo license |
+| `design-arbiter/SKILL.md`, `conflicts.md`, `CLAUDE.md`, this README | original | [MIT](LICENSE) |
+
+Full license texts for the vendored parts are in [`LICENSES/`](LICENSES/).
 
 Both vendored skill directories are unmodified. Every behavioural override lives in `CLAUDE.md`
 or in `design-arbiter/`, so `npx impeccable update` and `npx skills update` keep working.
