@@ -1,0 +1,4 @@
+node_modules/
+.impeccable/cache/
+.claude/settings.local.json
+.design-sources/
