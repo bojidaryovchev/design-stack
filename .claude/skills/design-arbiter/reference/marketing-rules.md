@@ -12,7 +12,7 @@ Derived from `Leonxlnx/taste-skill` (MIT). See `/NOTICE`.
 
 ## Why this file exists
 
-Every rule below was checked against Impeccable's 65 detector rule IDs and its
+Every rule below was checked against Impeccable's 59 detector rule IDs and its
 `craft-floor.md`. **Nothing here duplicates a rule Impeccable already enforces.** Impeccable
 already covers eyebrow spam, section numbering, nested cards, gradient text, the cream/beige
 palette, italic serif displays, overused fonts, line length, contrast, buzzwords, oversized

@@ -6,9 +6,12 @@ Copyright (c) Paul Bakaus and contributors
 Licensed under the Apache License, Version 2.0
 
 Vendored unmodified at .claude/skills/impeccable/ via `npx impeccable install`.
-Updated with `npx impeccable update`. No files in that directory are modified by
-this project; behavioural overrides live in CLAUDE.md and in
-.claude/skills/design-arbiter/.
+Updated with `npx impeccable update`. The four subagents in agents/ are vendored
+unmodified from impeccable's own plugin distribution (plugin/agents/), which is
+the only channel that ships them; the file-copy CLI install does not.
+
+No files in either location are modified by this project; behavioural overrides
+live in .claude/skills/design-arbiter/.
 
 You may obtain a copy of the Apache License at:
     http://www.apache.org/licenses/LICENSE-2.0

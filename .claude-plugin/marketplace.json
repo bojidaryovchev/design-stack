@@ -1,0 +1,31 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "design-stack",
+  "metadata": {
+    "description": "Three open-source design skills for AI coding agents, layered so they cooperate instead of cancelling out, plus an arbitration layer that resolves the points where they contradict."
+  },
+  "owner": {
+    "name": "Bojidar Yovchev"
+  },
+  "plugins": [
+    {
+      "name": "design-stack",
+      "description": "impeccable's 59-rule detector, edit hooks and 23 commands; emil-design-eng's motion and component specs; harvested marketing composition rules; and a design-arbiter skill that routes between them and rules on the 12 conflicts.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Bojidar Yovchev"
+      },
+      "source": "./",
+      "category": "design",
+      "homepage": "https://github.com/bojidaryovchev/design-stack",
+      "tags": [
+        "design",
+        "frontend",
+        "ui",
+        "ux",
+        "motion",
+        "anti-patterns"
+      ]
+    }
+  ]
+}

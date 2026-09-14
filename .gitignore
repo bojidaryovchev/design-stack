@@ -1,4 +1,26 @@
 node_modules/
-.impeccable/cache/
+
+# Impeccable runtime artifacts. The hook cache and live-session state are
+# per-machine; PRODUCT.md, DESIGN.md and .impeccable/design.json are not and
+# belong in a consuming project's repo, never in this one.
+.impeccable/
+
+# Provider mirrors. `npx impeccable install --providers=...` writes a full
+# duplicate of the skill tree per provider. This repo ships as a Claude Code
+# plugin instead, so those copies only drift. See CLAUDE.md.
+.agents/
+.codex/
+.cursor/
+.gemini/
+.github/skills/
+.grok/
+.kiro/
+.opencode/
+.pi/
+.qoder/
+.trae/
+.trae-cn/
+.vibe/
+
 .claude/settings.local.json
 .design-sources/

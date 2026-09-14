@@ -4,7 +4,7 @@ Where the three installed sources give contradictory instructions, these rulings
 Each cites the conflicting text so the ruling is auditable rather than arbitrary.
 
 Installed sources:
-- **impeccable** `.claude/skills/impeccable/` - Apache-2.0, 65 detector rules + hooks
+- **impeccable** `.claude/skills/impeccable/` - Apache-2.0, 59 detector rules + hooks
 - **emil-design-eng** `.claude/skills/emil-design-eng/` - MIT, motion and component craft
 - **taste-skill** - *not installed*; its countable rules are harvested into
   `marketing-rules.md`. See "Why taste-skill is not installed" below.
@@ -114,12 +114,18 @@ as an auto-triggering skill.
 
 These agree more than the detector rule name suggests:
 
-- taste-skill §9.G: absolute ban, *"no limited-use allowance"*.
+- taste-skill §9.G: absolute ban, no limited-use allowance. Its own wording:
+  *"The agent has historically ignored em-dash limits when phrased as 'use sparingly.' The
+  phrasing here is binary: zero em-dashes."*
 - impeccable's **detector** rule is `em-dash-overuse`, a frequency threshold, and it is
   classified advisory - it never counts as a failure or changes the exit code.
 - But impeccable's own **authoring** standard is zero. `docs/STYLE.md` denylists em dashes, and
   `validateSkillProse` in the build **fails `bun run build`** on an em dash anywhere in
   `skill/**/*.md`. Code comments are exempt; prose is not.
+
+Note the scope of that evidence: `validateSkillProse` bans **em** dashes only, and impeccable's
+own reference markdown uses en dashes freely (`65-75ch`). Extending the ban to en dashes is this
+arbiter's decision, taken for one consistent rule rather than two, not an upstream requirement.
 
 **Ruling:** zero em dashes (U+2014) and zero en dashes (U+2013) in user-visible copy: headlines,
 eyebrows, labels, buttons, body, quotes, attribution, captions, alt text. Use a comma, colon,
@@ -163,10 +169,12 @@ that this project got wrong initially.
 - `init.md`: *"`init` captures durable product truth in PRODUCT.md. It does not invent a visual
   world and does not write DESIGN.md."* and *"Never silently overwrite an existing file or offer
   DESIGN.md during init."*
-- `new-work.md` §7: on new or replaced worlds, `DESIGN.md` is written **after the build** by the
-  `impeccable-documenter` subagent, from the shipped artifact. *"A rulebook written before the
-  build gets defended against reality instead of describing it, and it hands the design-system
-  detector an unstable target."*
+- `new-work.md` §7: on new or replaced worlds, `DESIGN.md` is written **after the build**, from
+  the shipped artifact. The installed 4.0.2 text says *"After a first implementation of a new
+  world, update DESIGN.md with the exact tokens and behaviors that survived the build."*
+- The `impeccable-documenter` agent is the shipped way to do that pass with fresh eyes. It is
+  vendored at `agents/impeccable-documenter.md` and its own brief carries the rationale:
+  *"a rulebook written before the build gets defended against reality instead of describing it."*
 - `/impeccable document` is the separate path for recording an **incumbent** system.
 
 **Ruling:** never treat a missing `DESIGN.md` as evidence that a project is greenfield, and
@@ -177,11 +185,17 @@ contradicts it and the skill reference is authoritative.
 
 ## 10. Who owns the finish → **impeccable, on new work**
 
-`new-work.md` §7 already specifies a bounded finish: one batched desktop-plus-mobile screenshot
-round, material fixes, one confirming round, **two rounds ceiling**, then the
-`impeccable-finish-reviewer` subagent (fresh eyes outside the build thread's attention gravity),
-then the documenter. It explicitly says *"Do not run a second detector"* and *"the reviewer ran
-so that you do not re-open your own hunt."*
+`new-work.md` §7 already specifies the finish: inspect desktop and mobile, critique the render
+against the request, the direction contract and `DESIGN.md`, fix material gaps, re-inspect, then
+spawn the `impeccable-finish-reviewer` agent (fresh eyes outside the build thread's attention
+gravity), apply its short list of material fixes, and finish. It ends with *"Do not run a second
+detector."*
+
+**Version note.** impeccable's main branch tightens this into an explicit two-round ceiling with
+one batched desktop-plus-mobile screenshot round, and adds the documenter handoff to §7 by name.
+Neither phrase is in the installed 4.0.2 release, so this ruling cites the release. The bounded
+round discipline in the working agreement is the arbiter's own policy, not a quote. Re-check this
+ruling on the next impeccable update.
 
 **Ruling:** on new work, do not substitute an independent finish chain for that flow. The
 arbiter's own finish steps apply to **refinement of existing code**, where no direction contract
@@ -189,9 +203,9 @@ or approved comp exists for a reviewer to audit against.
 
 Related: for a genuinely open new surface, `new-work.md` runs a concept roll
 (`concept-seed.mjs`) that deliberately assigns a direction from outside the model's own ranking,
-plus a visual decision page (`serve-question.mjs`) and a standing "category canon" exit. Do not
-route around that machinery by picking a direction directly - its whole purpose is that a single
-ranking is deterministic and always ships the same safe candidate.
+plus a visual decision page (`serve-question.mjs`). Do not route around that machinery by picking
+a direction directly - its whole purpose is that a single ranking is deterministic and always
+ships the same safe candidate.
 
 ## 11. Image-first workflows: `image-to-code` vs `visualize.md` → **impeccable wins**
 
@@ -207,7 +221,7 @@ and ambitious work"*). The two disagree on what happens next:
 |---|---|---|
 | How many comps | one per section, 6-12 typical | exactly three compositional options |
 | User approval | none; proceeds to implementation | hard gate, *"stop and wait"* before any code |
-| Relationship to the image | *"not inspired by the image... visually faithful to the image"* (ss26), plus an anti-drift rule (ss27) | *"a north star, not something to trace"*, and *"do not rasterize core UI text or controls"* |
+| Relationship to the image | *"not inspired by the image... visually faithful to the image"* (§26), plus an anti-drift rule (§27) | *"a north star, not something to trace"*, and *"do not rasterize core UI text or controls"* |
 | Raster vs semantic | no equivalent step | an explicit fidelity inventory bucketing every element `produce` / `direct` / `semantic` |
 
 **Ruling:** use `visualize.md`. Three comps, one approval gate, comp as north star, and the

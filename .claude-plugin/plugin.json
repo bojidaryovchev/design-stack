@@ -1,0 +1,27 @@
+{
+  "name": "design-stack",
+  "description": "Layered design harness: impeccable's detector, hooks and commands, emil-design-eng's motion specs, and an arbitration layer that rules on the points where they contradict.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Bojidar Yovchev"
+  },
+  "homepage": "https://github.com/bojidaryovchev/design-stack",
+  "repository": "https://github.com/bojidaryovchev/design-stack",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "frontend",
+    "ui",
+    "ux",
+    "motion",
+    "anti-patterns",
+    "skills"
+  ],
+  "skills": "./.claude/skills/",
+  "agents": [
+    "./agents/impeccable-asset-producer.md",
+    "./agents/impeccable-documenter.md",
+    "./agents/impeccable-finish-reviewer.md",
+    "./agents/impeccable-manual-edit-applier.md"
+  ]
+}
