@@ -48,6 +48,12 @@ Binding specs from emil:
 - `@media (hover: hover) and (pointer: fine)` gate on every hover animation
 - `prefers-reduced-motion` means fewer and gentler, not zero - keep opacity and color
 
+impeccable 4.3 adopted that last one independently. `animate.md` now requires *"an intentional
+alternative"* and says reduced motion *"means fewer and gentler animations, not disabling all
+motion; feedback that confirms an action should remain legible."* The two sources agree, so this
+bullet is no longer an emil-only position. Left in place because the ruling is about where the
+component-level specs come from, and that answer has not changed.
+
 ---
 
 ## 3. Durations → **split by surface mode**
@@ -94,6 +100,16 @@ emil's other two curves have no counterpart and stand:
 **`ease-in` is banned on UI regardless of source.** It delays initial movement at the exact
 moment the user is watching most closely.
 
+**emil's `animate` skill (ruling 14) restates its own curve, and resolves this itself.** It
+declares `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` under a hard instruction: *"No approximated
+values. Every curve, duration, and spring config comes from the tables below."* Read alone that
+overrides this ruling. Read with the next line it does not: *"Extend the codebase's tokens, don't
+fork them. If `--ease-out` or a duration scale already exists, use it. Adding a parallel system
+is a defect."* This ruling puts `0.16, 1, 0.3, 1` in the project as `--ease-out`, so `animate`'s
+own second rule binds it to that value. The first rule is about not inventing curves from
+nothing, not about overriding a token that already exists. **Token in the project beats table in
+the skill.** `animate`'s spring configs have no counterpart here and stand unchanged.
+
 ---
 
 ## 5. Stack and dependencies → **impeccable wins**
@@ -107,6 +123,13 @@ moment the user is watching most closely.
 Never re-platform because a design skill prefers a different one. This is the single largest
 practical risk in stacking these sources and is the main reason taste-skill is not installed
 as an auto-triggering skill.
+
+**When there is no incumbent**, impeccable 4.3 added the missing half: `init.md` now says that
+on a project with no framework or scaffold, *"the stack is a user decision, not yours: ask once
+whether they want plain static HTML/CSS, a specific framework, or your recommendation"*, and
+records the answer under `## Stack` in PRODUCT.md, writing `delegated` when the user hands the
+choice back. So the full rule is: inherit an incumbent, ask on a greenfield, and never let a
+design skill's stack preference decide either way.
 
 ---
 
@@ -200,11 +223,14 @@ releases shipped it, so the note is retired.
 arbiter's own finish steps apply to **refinement of existing code**, where no direction contract
 or approved comp exists for a reviewer to audit against.
 
-Related: for a genuinely open new surface, `new-work.md` runs a concept roll
-(`concept-seed.mjs`) that deliberately assigns a direction from outside the model's own ranking,
-plus a visual decision page (`serve-question.mjs`). Do not route around that machinery by picking
-a direction directly - its whole purpose is that a single ranking is deterministic and always
-ships the same safe candidate.
+Related: for a genuinely open new surface, `new-work.md` runs a two-stage concept roll
+(`impeccable concept-seed --scope surface`, then `--scope direction`) that deliberately assigns
+a direction from outside the model's own ranking, presents it on a visual decision page, and
+always offers what 4.3 calls **the standing exit**: *"one quiet, permanent alternative, the
+category standard, played straight. It is the user's door."* Do not route around that machinery
+by picking a direction directly. Its whole purpose is that a single ranking is deterministic and
+always ships the same safe candidate, and the standing exit is what keeps the roll from forcing
+a novelty the user did not want.
 
 ## 11. Image-first workflows: `image-to-code` vs `visualize.md` → **impeccable wins**
 
@@ -226,6 +252,15 @@ and ambitious work"*). The two disagree on what happens next:
 **Ruling:** use `visualize.md`. Three comps, one approval gate, comp as north star, and the
 fidelity inventory before building. `image-to-code`'s copy discipline would trace UI text and
 controls into rasters that impeccable's inventory step exists specifically to keep semantic.
+
+**Whether to go image-first at all is now a recorded setting, not a per-surface call.**
+impeccable 4.3 has `init` ask once, when image generation is available, and write
+`.impeccable/config.json` as `"buildPath": "comp"` or `"code"`: comp-first means an image sets
+the bar before any code (bolder composition, slower, the build must match the image), code-first
+means building directly with the ambition carried by the direction contract. `new-work.md` is
+explicit that this *"is a workflow preference, not a per-surface decision; no round asks it."*
+So do not re-litigate it per surface, and do not infer it from silence: unrecorded means
+comp-first where image generation exists, said out loud for that session and not stored.
 
 `image-to-code` is not installed, so this is latent rather than live. It is recorded because the
 image-first workflow is a reasonable thing to reach for, and reaching for that skill by name
@@ -279,3 +314,71 @@ To use it directly anyway for a greenfield marketing exploration:
 `npx skills add https://github.com/Leonxlnx/taste-skill --skill design-taste-frontend`
 Then run `/impeccable document` afterwards to fold the result into `DESIGN.md`, and remove it
 again. Do not leave it installed during product-UI work.
+
+## 13. Eyebrows and kickers → **banned, impeccable wins**
+
+New in impeccable 4.3. This one matters more than its size suggests because the two sources
+are not symmetrical here: one is prose, the other fires on every edit.
+
+- taste-skill's hero rule permits one: *"Optional eyebrow OR brand strip (pick zero or one),
+  headline, subtext, CTAs."* Two of its other rules presuppose eyebrows exist, scoping version
+  labels and micro-meta sentences to them.
+- impeccable 4.0 agreed, loosely. `craft-floor.md` listed *"a tracked uppercase eyebrow over
+  every section"* as a default to avoid, and the detector rule `repeated-section-kickers` fired
+  only on repetition.
+- impeccable 4.3 hardened both. `craft-floor.md` now reads: *"A kicker or eyebrow above a
+  heading. This one is a ban, not a default: no brief earns it back."* The old detector rule is
+  gone, replaced by `kicker-above-heading`: *"banned outright, repeated or not."*
+
+**Ruling:** no kicker or eyebrow above any heading, anywhere, on any surface. The hero carries
+headline, subtext, and CTAs: three text elements, not four. If the eyebrow's words matter, work
+them into the heading or the body.
+
+**Why the asymmetry decides it.** A permissive prose rule against a deterministic detector rule
+is not a real contest. Leaving the permission in `marketing-rules.md` would have the arbiter
+instruct a model to build something the `PostToolUse` hook flags on the very next edit, which
+costs a round trip every time and teaches the model to distrust one of the two sources. When a
+prose source and an enforced source disagree, the enforced one wins by default; the only
+question worth asking is whether the enforcement is wrong, and here it is not.
+
+`marketing-rules.md` has been amended accordingly: the hero budget drops to three text
+elements, and the two rules that scoped themselves to eyebrows now scope to headings.
+
+## 14. Motion authorship: `/impeccable animate` vs emil's `animate` → **sequence, not contest**
+
+emil shipped a new `animate` skill in August. It auto-triggers on *"animate something, add
+motion, make a component feel alive, or build a transition"*, and unlike `emil-design-eng` it
+**writes the implementation**. That overlaps `/impeccable animate` on trigger, so on the surface
+it looks like the exact collision this project exists to prevent.
+
+It is not, because the two work at different layers:
+
+| | owns | answers |
+|---|---|---|
+| `/impeccable animate` | art direction | should this move, what is the focal moment, what material does it have in this world |
+| `emil-design-eng` | reference | component-level specs, interaction states, the craft floor for motion |
+| emil `animate` | procedure | given it moves: which tool, which properties, curve or spring, how it interrupts, how it exits, and the code |
+
+**Ruling:** they run in that order on a surface that needs authored motion. `/impeccable animate`
+decides **whether and what**. emil's `animate` decides **how** and writes it. Never let `animate`
+fire first and settle the thesis by implication: a motion that is technically excellent and
+directionally arbitrary is the failure this ordering prevents. If only one is going to run,
+on a Persuade or Experience surface it is `/impeccable animate`, because direction is the part
+nothing else supplies.
+
+**Why take it at all.** It carries three things no other installed source has: spring configs
+with criteria for reaching for one instead of a curve, asymmetric timing (slow on the deliberate
+phase, snappy on the system response), and interruption and exit behavior. Motion that survives
+being interrupted is most of the distance between competent and delightful, and it is the part
+models get wrong by default.
+
+**Why this does not violate the no-second-vocabulary rule.** The warning this project is built
+on is about base-layer design skills, each carrying a full worldview about what a page should
+look like. `animate` has no aesthetic opinions. It is a specialist in one narrow decision, the
+same slot `emil-design-eng` already occupies, and the layering model has room for specialists.
+A third full vocabulary would still be refused.
+
+Not adopted from the same release: `prototype` (redundant against `/impeccable live`, which has
+identity lock, parameter knobs and carbonize cleanup), `pick-ui-library` (would work against
+ruling 5), `apple-design` (a base-layer aesthetic vocabulary, refused on the rule above), and
+`animate-expo`, `ask-sonner`, `write-swift` (out of scope for this stack).

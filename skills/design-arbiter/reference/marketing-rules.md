@@ -23,8 +23,10 @@ These are the mechanically checkable composition rules Impeccable has **no** rul
 
 ## Hero
 
-- **Max 4 text elements total.** Optional eyebrow OR brand strip (pick zero or one), headline,
-  subtext, CTAs. Nothing else.
+- **Max 3 text elements total.** Headline, subtext, CTAs. Nothing else.
+  Upstream's version of this rule allowed an optional eyebrow or brand strip. Impeccable 4.3
+  bans kickers and eyebrows outright, detector-enforced as `kicker-above-heading`, so that
+  option is removed here. See ruling 13.
 - **Headline max 2 lines desktop. Subtext max 20 words AND max 3-4 lines.** A 4-line hero
   headline is a font-size error, never a copy-length error.
 - **Top padding cap `pt-24`** (~6rem) desktop. More reads as a layout bug, not intentional space.
@@ -32,8 +34,9 @@ These are the mechanically checkable composition rules Impeccable has **no** rul
   feature bullets, social-proof avatar row. All move to sections below.
 - **"Trusted by" logo wall goes under the hero,** never inside it.
 - **Hero needs a real visual.** Text plus a gradient blob is a placeholder, not a hero.
-- **No version labels as hero eyebrows** (`V0.6`, `BETA`, `EARLY ACCESS`) unless the brief is
-  explicitly about launch status.
+- **No version labels anywhere in the hero** (`V0.6`, `BETA`, `EARLY ACCESS`). Upstream scoped
+  this to eyebrows with a launch-status exception; with eyebrows banned outright the label has
+  nowhere left to sit, so the exception is gone too.
 
 ## Section composition
 
@@ -183,9 +186,9 @@ covers those. What remains is what nothing else in this stack checks.
 **Hero**
 - [ ] Headline ≤ 2 lines; subtext ≤ 20 words AND ≤ 4 lines; CTA visible without scrolling.
 - [ ] Hero top padding ≤ `pt-24` at desktop.
-- [ ] ≤ 4 text elements. No tagline under the CTAs, no trust micro-strip, no pricing teaser.
+- [ ] ≤ 3 text elements. No tagline under the CTAs, no trust micro-strip, no pricing teaser.
 - [ ] Logo wall sits under the hero, uses real SVG marks, not plain text wordmarks.
-- [ ] No version label (`V0.6`, `BETA`, `INVITE-ONLY`) as the hero eyebrow.
+- [ ] No kicker or eyebrow above any heading, and no version label anywhere in the hero.
 
 **Composition**
 - [ ] At least 4 distinct layout families across 8 sections; no family used more than twice.
@@ -211,7 +214,7 @@ covers those. What remains is what nothing else in this stack checks.
 
 **Decoration tells**
 - [ ] No scroll cues, locale/time/weather strips, hero-bottom text strips, decorative status
-      dots, version footers, or micro-meta sentences under eyebrows.
+      dots, version footers, or micro-meta sentences under headings.
 
 **Motion** (defers to the arbiter's rulings 1-4, not to taste-skill's dials)
 - [ ] Every animation justifiable in one sentence.

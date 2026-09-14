@@ -21,7 +21,7 @@ Skills for Design Engineers - https://github.com/emilkowalski/skills
 Copyright (c) Emil Kowalski
 Licensed under the MIT License
 
-Vendored unmodified at skills/{emil-design-eng, review-animations,
+Vendored unmodified at skills/{emil-design-eng, animate, review-animations,
 improve-animations, animation-vocabulary}/ via `npx skills add emilkowalski/skills`.
 Tracked in skills-lock.json. Updated with `npx skills update`.
 

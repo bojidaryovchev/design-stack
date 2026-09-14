@@ -36,6 +36,9 @@ Precedence, always in effect:
    Never re-platform because a design skill prefers something else.
 6. Copy: zero em dashes (U+2014) and zero en dashes (U+2013) in user-visible copy. Ranges
    use a plain hyphen. Source code and comments are exempt.
+6b. No kicker or eyebrow above any heading, on any surface. A hero carries headline, subtext
+   and CTAs: three text elements, not four. Detector-enforced, so building one costs a round
+   trip. If the label's words matter, work them into the heading or the body.
 7. Review format: emil's \`| Before | After | Why |\` table for motion reviews only.
 8. Skip emil's canned animations.dev first response; apply its content directly.
 

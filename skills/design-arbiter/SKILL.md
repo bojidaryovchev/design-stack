@@ -1,6 +1,6 @@
 ---
 name: design-arbiter
-description: Routes design work across the installed design skills (impeccable, emil-design-eng) and rules on the points where they contradict each other. Use when starting any UI work, when two design sources give conflicting guidance on motion timing, easing, stack choice, or copy, when building or reviewing a marketing/landing/portfolio surface, or when deciding which design command to run. Carries no aesthetic opinions of its own.
+description: Routes design work across the installed design skills (impeccable, emil-design-eng, animate) and rules on the points where they contradict each other. Use when starting any UI work, when two design sources give conflicting guidance on motion timing, easing, stack choice, or copy, when building or reviewing a marketing/landing/portfolio surface, or when deciding which design command to run. Carries no aesthetic opinions of its own.
 ---
 
 # Design arbiter
@@ -15,6 +15,7 @@ becoming a fourth competing vocabulary, which is the failure mode it exists to p
 |---|---|---|
 | **impeccable** | Base vocabulary, process, art direction, enforcement | `skills/impeccable/` + edit hooks |
 | **emil-design-eng** | Motion mechanics and component interaction specs | `skills/emil-design-eng/` |
+| **emil animate** | How a given motion is built: tool, properties, curve or spring, interruption, exit | `skills/animate/` |
 | **taste-skill** | Countable composition rules for marketing surfaces | harvested → `reference/marketing-rules.md` |
 
 impeccable is the base because it is the only source with deterministic enforcement: 62
@@ -119,6 +120,7 @@ an incumbent system. A missing `DESIGN.md` is not a reason to run `init`. See ru
 | Too bland / too loud / too complex | `/impeccable bolder` · `quieter` · `distill` |
 | **Adding motion - direction and thesis** | `/impeccable animate` |
 | **Adding motion - durations, easing, component specs** | `emil-design-eng` (see ruling 2) |
+| **Building a specific motion - tool, curve or spring, interrupt, exit** | `animate` (see ruling 14) |
 | **Reviewing motion** | `review-animations`, or `improve-animations` for a codebase pass |
 | Naming a motion precisely | `animation-vocabulary` |
 | Visual iteration in the browser | `/impeccable live` (needs a dev server; see below) |
@@ -160,6 +162,10 @@ ruling. Summary:
 11. **Image-first** → impeccable's visualize.md, not taste-skill's image-to-code.
 12. **Who may author DESIGN.md** → impeccable's format always. Never `stitch-design-taste`,
     whose headings `document.md` names as a pitfall by exact string.
+13. **Eyebrows and kickers** → banned outright above any heading, on any surface. The hero
+    carries three text elements, not four. Detector-enforced as `kicker-above-heading`.
+14. **Motion authorship** → sequence, not contest. `/impeccable animate` decides whether and
+    what; emil's `animate` decides how and writes it. Never let `animate` settle the thesis.
 
 ## Live mode has its own rules
 

@@ -28,12 +28,12 @@ const STAGING = path.join(ROOT, '.claude', 'skills');
 const DEST = path.join(ROOT, 'skills');
 const OURS = 'design-arbiter';
 
-const UPSTREAM = ['impeccable', 'emil-design-eng', 'review-animations', 'improve-animations', 'animation-vocabulary'];
+const UPSTREAM = ['impeccable', 'emil-design-eng', 'animate', 'review-animations', 'improve-animations', 'animation-vocabulary'];
 
 const INSTALLERS = [
   ['npx', ['-y', 'impeccable', 'install', '--providers=claude', '--scope=project']],
   ['npx', ['-y', 'skills', 'add', 'emilkowalski/skills',
-    '-s', 'emil-design-eng', '-s', 'review-animations',
+    '-s', 'emil-design-eng', '-s', 'animate', '-s', 'review-animations',
     '-s', 'improve-animations', '-s', 'animation-vocabulary',
     '--agent', 'claude-code', '--copy', '-y']],
 ];

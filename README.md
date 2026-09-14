@@ -1,7 +1,7 @@
 # design-stack
 
 Three of the best open-source design skills for AI coding agents, layered so they cooperate
-instead of cancelling each other out, plus an arbitration layer that resolves the twelve points
+instead of cancelling each other out, plus an arbitration layer that resolves the fourteen points
 where they contradict.
 
 ## The problem this solves
@@ -42,12 +42,13 @@ skills-lock.json                   emil skills pinned by content hash
 skills/
   impeccable/                      upstream, unmodified. npm run sync-upstream
   emil-design-eng/                 upstream, unmodified
+  animate/                         upstream. how a given motion is built
   review-animations/               upstream. user-invocable only
   improve-animations/              upstream
   animation-vocabulary/            upstream
   design-arbiter/                  THE ONLY ORIGINAL WORK HERE
     SKILL.md                       working agreement, routing table, surface modes, tiers
-    reference/conflicts.md         12 rulings, each citing the conflicting text
+    reference/conflicts.md         14 rulings, each citing the conflicting text
     reference/marketing-rules.md   taste-skill's countable rules, harvested
 .design-sources/                   gitignored. the four upstream repos, for re-verification
 ```
@@ -83,7 +84,7 @@ surfaces it applies to.
 The arbiter carries no design taste of its own. That constraint is stated in the skill itself,
 because a fourth opinionated vocabulary is exactly the problem this exists to solve.
 
-## The twelve rulings
+## The fourteen rulings
 
 Each cites the conflicting passage in `reference/conflicts.md` so it is auditable, not arbitrary.
 
@@ -101,6 +102,8 @@ Each cites the conflicting passage in `reference/conflicts.md` so it is auditabl
 | 10 | Who owns the finish | impeccable on new work; the arbiter's chain is for refinement |
 | 11 | Image-first workflow | impeccable's `visualize.md`, not taste-skill's `image-to-code` |
 | 12 | DESIGN.md format | Only `/impeccable document` writes it |
+| 13 | Eyebrows and kickers | Banned above any heading. Hero carries three text elements |
+| 14 | Motion authorship | Sequence. impeccable decides whether and what; emil's `animate` decides how |
 
 ## Two things worth knowing before you use it
 
@@ -236,7 +239,7 @@ Mixed licensing, documented per-source in [NOTICE](NOTICE).
 | Part | Source | License |
 |---|---|---|
 | `skills/impeccable/`, `agents/` | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 |
-| `skills/{emil-design-eng, review-animations, improve-animations, animation-vocabulary}/` | [emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
+| `skills/{emil-design-eng, animate, review-animations, improve-animations, animation-vocabulary}/` | [emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
 | `reference/marketing-rules.md` (derived) | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | MIT |
 | `design-arbiter/`, `hooks/`, `scripts/`, `.claude-plugin/`, `CLAUDE.md`, this README | original | [MIT](LICENSE) |
 
