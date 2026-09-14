@@ -1,89 +1,94 @@
 #!/usr/bin/env node
 /**
- * Detector tier preflight.
+ * Engine preflight.
  *
- * The impeccable detector runs three engines and two of them degrade when
- * their dependencies are absent. The static-HTML engine degrades *silently*:
- * `detect-html.mjs` catches the failed import and falls back to the regex
- * engine, so a `.html` file with an oversized h1, destructive tracking and a
- * cream background reports zero findings and exit 0. That reads as "clean"
- * when it means "not checked".
+ * impeccable 4.3.x runs a self-contained Rust binary. The launcher at
+ * skills/impeccable/scripts/impeccable resolves it in order: $IMPECCABLE_BIN,
+ * a sibling bin/<os>-<arch>/, ~/.impeccable/bin/<version>/, then PATH, and as a
+ * last resort downloads the pinned version from GitHub releases and verifies it
+ * against a .sha256 sidecar before running it.
  *
- * This module reports which tiers are actually live so the failure is visible.
- * It is the answer to the stack's own warning that a clean hook result is not
- * a clean bill of health.
+ * That download needs network and a writable cache. On a machine that has
+ * neither, every detector hook fails, so this checks that the engine answers
+ * its handshake and reports the version it answered with.
+ *
+ * Historical note: through 4.0.x the detector was JavaScript and the
+ * static-HTML tier imported four npm parsers. With them missing it caught the
+ * import error and silently fell back to regex, reporting zero findings and
+ * exit 0, which reads as clean when it means not checked. The Rust engine has
+ * no such tier split and no npm dependencies, so that failure mode is gone.
  *
  *   node scripts/preflight.mjs            human-readable
  *   node scripts/preflight.mjs --json     machine-readable
  */
 
-import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const STATIC_HTML_DEPS = ['htmlparser2', 'css-select', 'css-tree', 'domutils'];
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SKILL_DIR = path.join(ROOT, 'skills', 'impeccable');
+const LAUNCHER = path.join(SKILL_DIR, 'scripts', process.platform === 'win32' ? 'impeccable.cmd' : 'impeccable');
 
-async function canImport(specifier) {
+function pinnedVersion() {
   try {
-    await import(specifier);
-    return true;
+    return fs.readFileSync(path.join(SKILL_DIR, 'scripts', 'VERSION'), 'utf8').trim();
   } catch {
-    return false;
+    return null;
   }
 }
 
-/**
- * Resolve tier availability from the plugin root's own module graph.
- * Imports are attempted from this file, so they resolve against the plugin's
- * node_modules exactly as the detector's own imports do.
- */
-export async function preflight() {
-  const staticResults = await Promise.all(
-    STATIC_HTML_DEPS.map(async (dep) => [dep, await canImport(dep)])
-  );
-  const missingStatic = staticResults.filter(([, ok]) => !ok).map(([dep]) => dep);
-  const browser = await canImport('puppeteer');
+export function preflight() {
+  const pinned = pinnedVersion();
+  const skills = fs.existsSync(path.join(ROOT, 'skills'))
+    ? fs.readdirSync(path.join(ROOT, 'skills'), { withFileTypes: true })
+      .filter((e) => e.isDirectory() && fs.existsSync(path.join(ROOT, 'skills', e.name, 'SKILL.md')))
+      .map((e) => e.name)
+    : [];
 
-  return {
-    regex: { live: true, needs: [], catches: 'literal patterns in any source file' },
-    staticHtml: {
-      live: missingStatic.length === 0,
-      needs: missingStatic,
-      catches: 'cascade-resolved rules on .html files: oversized-h1, extreme-negative-tracking, cream-palette, cramped-padding, icon-tile-stack and more',
-    },
-    browser: {
-      live: browser,
-      needs: browser ? [] : ['puppeteer'],
-      catches: 'structural and computed rules, rendered URLs only: nested-cards, tiny-text, low-contrast, text-occlusion',
-    },
-  };
+  if (!fs.existsSync(LAUNCHER)) {
+    return { pinned, skills, engine: { ok: false, reason: `launcher missing at ${path.relative(ROOT, LAUNCHER)}` } };
+  }
+
+  try {
+    // A .cmd launcher is not directly executable by CreateProcess, so Windows
+    // needs the shell. Quote the path: it can contain spaces.
+    const win = process.platform === 'win32';
+    const out = execFileSync(win ? `"${LAUNCHER}"` : LAUNCHER, ['engine-probe'], {
+      cwd: ROOT, encoding: 'utf8', timeout: 120_000, stdio: ['ignore', 'pipe', 'pipe'], shell: win,
+    }).trim();
+    const version = out.startsWith('impeccable-engine') ? out.split(/\s+/)[1] : null;
+    if (!version) return { pinned, skills, engine: { ok: false, reason: `unexpected handshake: ${out.slice(0, 80)}` } };
+    return { pinned, skills, engine: { ok: true, version, matchesPinned: !pinned || version === pinned } };
+  } catch (error) {
+    const detail = (error?.stderr || error?.message || '').toString().trim().split('\n')[0];
+    return { pinned, skills, engine: { ok: false, reason: detail || 'engine-probe failed' } };
+  }
 }
 
-export function summarize(report) {
-  const down = [];
-  if (!report.staticHtml.live) down.push('static-HTML');
-  if (!report.browser.live) down.push('browser');
-  return { down, allLive: down.length === 0 };
-}
-
-function render(report) {
-  const rows = [
-    ['regex', report.regex],
-    ['static-HTML', report.staticHtml],
-    ['browser + visual', report.browser],
-  ];
-  const lines = ['Design-stack detector tiers:', ''];
-  for (const [name, tier] of rows) {
-    const mark = tier.live ? 'live' : `DOWN (missing ${tier.needs.join(', ')})`;
-    lines.push(`  ${name.padEnd(18)} ${mark}`);
-    lines.push(`  ${' '.repeat(18)} ${tier.catches}`);
+function render(r) {
+  const lines = [];
+  lines.push(`skills discoverable   ${r.skills.length} (${r.skills.join(', ') || 'none'})`);
+  lines.push(`engine version pinned ${r.pinned || 'unknown'}`);
+  if (r.engine.ok) {
+    lines.push(`engine responding     yes, ${r.engine.version}`);
+    if (!r.engine.matchesPinned) {
+      lines.push('');
+      lines.push(`WARNING: the engine answering is ${r.engine.version}, not the pinned ${r.pinned}.`);
+      lines.push('Something earlier in the launcher search order is winning. Check $IMPECCABLE_BIN and PATH.');
+    } else {
+      lines.push('');
+      lines.push('Ready. The detector hooks will run.');
+    }
+  } else {
+    lines.push('engine responding     NO');
     lines.push('');
+    lines.push(`The engine did not answer: ${r.engine.reason}`);
+    lines.push('Every detector hook fails until it does. The launcher downloads the pinned');
+    lines.push('version on first run, so this usually means no network or no writable cache.');
+    lines.push('Set IMPECCABLE_BIN to a preinstalled binary, or IMPECCABLE_HOME to a writable path.');
   }
-  const { allLive } = summarize(report);
-  lines.push(
-    allLive
-      ? 'All tiers live. A clean scan of a rendered URL is a real clean result.'
-      : 'Run `npm install` in the plugin root. Until then the missing tiers report zero findings without saying they were skipped.'
-  );
   return lines.join('\n');
 }
 
@@ -91,11 +96,9 @@ const isMain = process.argv[1]
   && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
 if (isMain) {
-  const report = await preflight();
-  if (process.argv.includes('--json')) {
-    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-  } else {
-    process.stdout.write(`${render(report)}\n`);
-  }
-  process.exit(summarize(report).allLive ? 0 : 1);
+  const report = preflight();
+  process.stdout.write(process.argv.includes('--json')
+    ? `${JSON.stringify(report, null, 2)}\n`
+    : `${render(report)}\n`);
+  process.exit(report.engine.ok && report.engine.matchesPinned ? 0 : 1);
 }

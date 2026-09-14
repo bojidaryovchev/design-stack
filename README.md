@@ -17,7 +17,7 @@ base-layer design skill. The naive fixes both lose:
 
 - **Install one, ignore the rest.** You lose emil's component-level motion specs, which nothing
   else has, and taste-skill's countable composition rules, which nothing else has either.
-- **Merge them into one skill.** You lose impeccable's 59 deterministic detector rules, its edit
+- **Merge them into one skill.** You lose impeccable's 62 deterministic detector rules, its edit
   hooks, live mode, and CLI, because none of that survives translation into markdown.
 
 This repo does neither. It keeps impeccable and emil installed **unmodified** from upstream, and
@@ -33,23 +33,28 @@ hooks/
   hooks.json                       SessionStart, PostToolUse, Stop. all ${CLAUDE_PLUGIN_ROOT}
   session-start.mjs                injects the precedence card (~460 tokens) + tier warning
 agents/                            impeccable's four subagents, vendored from its plugin build
-scripts/preflight.mjs              which detector tiers are actually live
-package.json                       the detector's runtime dependencies. run npm install
+scripts/preflight.mjs              is the impeccable engine reachable and the right version
+scripts/sync-upstream.mjs          refresh the vendored skills from upstream
+package.json                       scripts and metadata. no dependencies
 CLAUDE.md                          maintainer notes for this repo only. no rulings here
 NOTICE                             Apache-2.0 + MIT attribution for all three sources
 skills-lock.json                   emil skills pinned by content hash
-.claude/
-  skills/impeccable/               upstream, unmodified. npx impeccable update
-  skills/emil-design-eng/          upstream, unmodified. npx skills update
-  skills/review-animations/        upstream. user-invocable only
-  skills/improve-animations/       upstream
-  skills/animation-vocabulary/     upstream
-  skills/design-arbiter/           THE ONLY ORIGINAL WORK HERE
+skills/
+  impeccable/                      upstream, unmodified. npm run sync-upstream
+  emil-design-eng/                 upstream, unmodified
+  review-animations/               upstream. user-invocable only
+  improve-animations/              upstream
+  animation-vocabulary/            upstream
+  design-arbiter/                  THE ONLY ORIGINAL WORK HERE
     SKILL.md                       working agreement, routing table, surface modes, tiers
     reference/conflicts.md         12 rulings, each citing the conflicting text
     reference/marketing-rules.md   taste-skill's countable rules, harvested
 .design-sources/                   gitignored. the four upstream repos, for re-verification
 ```
+
+`skills/`, `agents/` and `hooks/hooks.json` sit at the plugin root because that is where Claude
+Code looks. Component discovery is conventional; there is no supported manifest key that points
+at skills elsewhere, so these directories cannot be rearranged.
 
 The working agreement and the precedence rulings live in `design-arbiter/SKILL.md`, not in
 `CLAUDE.md`. A plugin cannot ship a `CLAUDE.md`, so a compact card is injected at SessionStart
@@ -107,55 +112,51 @@ Getting this wrong means running a redundant audit against a flow that explicitl
 run a second detector."*
 
 **A clean hook result is not a clean bill of health.** The detector engines do not cover the same
-rules, and two of the three need dependencies:
+rules:
 
-| Tier | Runs on | Catches | Needs |
-|---|---|---|---|
-| regex | any source file | `side-tab`, `gradient-text`, `overused-font`, `bounce-easing`, `gray-on-color` | nothing |
-| static-HTML | `.html` with `<style>` or linked CSS | plus `oversized-h1`, `extreme-negative-tracking`, `cream-palette`, `cramped-padding`, `icon-tile-stack`, `clipped-overflow-container` | 4 parser packages |
-| browser + visual | **a rendered URL only** | `nested-cards`, `tiny-text`, `low-contrast`, `text-occlusion` | `puppeteer` |
+| Tier | Runs on | Catches |
+|---|---|---|
+| regex | any source file | `side-tab`, `gradient-text`, `overused-font`, `bounce-easing`, `gray-on-color` |
+| static-HTML | `.html` with `<style>` or linked CSS | plus `oversized-h1`, `extreme-negative-tracking`, `cream-palette`, `cramped-padding`, `icon-tile-stack`, `clipped-overflow-container` |
+| browser + visual | **a rendered URL only** | `nested-cards`, `tiny-text`, `low-contrast`, `text-occlusion` |
 
-Two things bite here. **The static-HTML engine fails open**: with its parsers missing it catches
-the import error, falls back to regex, and reports zero findings with exit 0, which reads as
-clean when it means not checked. And **the per-edit hook surfaces only a 14-rule immediate
-tier**; everything else waits for the `Stop` deep pass. `npm run preflight` reports which tiers
-are live, and the SessionStart hook warns automatically when one is down.
+Two things bite. **The per-edit hook surfaces only a 14-rule immediate tier**; everything else
+waits for the `Stop` deep pass. And **a silent hook is not a clean one**: the engine binary is
+fetched on first use, so with no network or no writable cache every hook fails quietly.
+`npm run preflight` answers whether the engine responds, and the SessionStart hook says so
+automatically when it does not.
 
 Before shipping a surface, run `/impeccable audit <target>` against a dev server, or scan the
 URL directly:
 
 ```bash
-node .claude/skills/impeccable/scripts/detect.mjs http://localhost:3000
-node .claude/skills/impeccable/scripts/detect.mjs http://localhost:3000 --viewport 390x844
+skills/impeccable/scripts/impeccable detect http://localhost:3000
+skills/impeccable/scripts/impeccable detect http://localhost:3000 --viewport 390x844
 ```
 
 ## Install
-
-Requires Node 22.12+ (impeccable's floor).
 
 ```
 /plugin marketplace add bojidaryovchev/design-stack
 /plugin install design-stack@design-stack
 ```
 
-Then, once, in the installed plugin's directory:
+That is the whole setup. There is no install step and no dependency to fetch by hand. Skills,
+the four impeccable agents, and all three hooks resolve from the plugin root through
+`${CLAUDE_PLUGIN_ROOT}`, so **nothing is copied into your project**. The only files that ever
+land in a consuming repo are the design artifacts impeccable writes there on purpose:
+`PRODUCT.md`, `DESIGN.md`, and `.impeccable/`.
 
-```bash
-npm install
-```
-
-That is the whole setup. Skills, the four impeccable agents, and all three hooks resolve from
-the plugin root through `${CLAUDE_PLUGIN_ROOT}`, so **nothing is copied into your project**. The
-only files that ever land in a consuming repo are the design artifacts impeccable writes there
-on purpose: `PRODUCT.md`, `DESIGN.md`, and `.impeccable/`.
-
-`npm install` is separate because Claude Code does not run an install step for plugins, and the
-detector's parsers are real runtime dependencies. Skip it and you are on the regex tier only.
+The detector is a self-contained Rust binary. Its launcher fetches the pinned engine on first
+use, verifies it against a published checksum, and caches it in `~/.impeccable/bin/`. No Node
+runtime is needed for it, and there are no npm packages to install. On a machine with no network
+or no writable cache, set `IMPECCABLE_BIN` to a preinstalled engine instead.
 
 To hack on it locally, clone the repo and point the marketplace at the checkout:
 
 ```bash
-git clone https://github.com/bojidaryovchev/design-stack && cd design-stack && npm install
+git clone https://github.com/bojidaryovchev/design-stack && cd design-stack
+npm run preflight     # confirms the engine answers
 # then: /plugin marketplace add ./
 ```
 
@@ -234,8 +235,8 @@ Mixed licensing, documented per-source in [NOTICE](NOTICE).
 
 | Part | Source | License |
 |---|---|---|
-| `.claude/skills/impeccable/`, `agents/` | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 |
-| `.claude/skills/{emil-design-eng, review-animations, improve-animations, animation-vocabulary}/` | [emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
+| `skills/impeccable/`, `agents/` | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | Apache-2.0 |
+| `skills/{emil-design-eng, review-animations, improve-animations, animation-vocabulary}/` | [emilkowalski/skills](https://github.com/emilkowalski/skills) | MIT |
 | `reference/marketing-rules.md` (derived) | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | MIT |
 | `design-arbiter/`, `hooks/`, `scripts/`, `.claude-plugin/`, `CLAUDE.md`, this README | original | [MIT](LICENSE) |
 

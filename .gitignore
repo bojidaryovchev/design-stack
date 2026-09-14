@@ -22,5 +22,7 @@ node_modules/
 .trae-cn/
 .vibe/
 
-.claude/settings.local.json
+# Staging directory. The upstream installers insist on writing here;
+# npm run sync-upstream moves the result into skills/ and removes it.
+.claude/
 .design-sources/

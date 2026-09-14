@@ -17,7 +17,6 @@
     "anti-patterns",
     "skills"
   ],
-  "skills": "./.claude/skills/",
   "agents": [
     "./agents/impeccable-asset-producer.md",
     "./agents/impeccable-documenter.md",

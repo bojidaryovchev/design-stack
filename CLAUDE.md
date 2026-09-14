@@ -15,7 +15,7 @@ design artifacts impeccable produces there on purpose (`PRODUCT.md`, `DESIGN.md`
 ## Where the behaviour lives
 
 **The working agreement and the precedence rulings are in
-`.claude/skills/design-arbiter/SKILL.md`, not here.** They used to live in this file, which meant
+`skills/design-arbiter/SKILL.md`, not here.** They used to live in this file, which meant
 they only applied inside this repo. A plugin cannot ship a `CLAUDE.md`, so they moved into the
 skill (loaded on demand) plus a compact card injected by `hooks/session-start.mjs` on every
 session, which is what makes the chain fire without the user naming a command.
@@ -26,7 +26,7 @@ Do not restate those rulings in this file. One copy, in the skill, is the point.
 
 ```
 .claude-plugin/       marketplace.json + plugin.json. The distribution manifest
-.claude/skills/       impeccable (Apache-2.0), emil's four (MIT), design-arbiter (original)
+skills/               impeccable (Apache-2.0), emil's four (MIT), design-arbiter (original)
 agents/               impeccable's four subagents, vendored from its plugin distribution
 hooks/                hooks.json (SessionStart, PostToolUse, Stop) + session-start.mjs
 scripts/preflight.mjs detector tier availability check
@@ -34,27 +34,35 @@ package.json          the detector's runtime dependencies
 .design-sources/      gitignored. The four upstream repos, for re-verifying the rulings
 ```
 
-`.claude/skills/` is deliberately kept at that path rather than moved to `skills/` so
-`npx impeccable update` and `npx skills update` keep working against it.
+**These paths are load-bearing, not preference.** Claude Code discovers plugin components by
+convention from the plugin root: `skills/<name>/SKILL.md`, `agents/*.md`, `hooks/hooks.json`.
+Anthropic's `plugin-dev` skill documents custom-path keys for `commands`, `agents`, `hooks` and
+`mcpServers` **only**, and none of the 39 plugins in the official marketplace uses one. There is
+no supported way to point at skills somewhere else, so a layout like `.claude/skills/` loads
+nothing. Do not move these directories.
 
 ## Maintenance rules
 
-- **Never edit anything under `.claude/skills/impeccable/` or
-  `.claude/skills/emil-design-eng/`** (or `review-animations`, `improve-animations`,
+- **Never edit anything under `skills/impeccable/` or
+  `skills/emil-design-eng/`** (or `review-animations`, `improve-animations`,
   `animation-vocabulary`). All are vendored unmodified and updatable. Overrides belong in
   `design-arbiter/`.
 - **`agents/` is vendored too.** Refresh it from impeccable's `plugin/agents/` on update. The
   file-copy CLI install does not ship these; only the plugin distribution does.
-- **Run `npm install` after cloning.** Without it the static-HTML detector tier fails open: it
-  catches the import error, falls back to regex, and reports zero findings with exit 0. Verify
-  with `npm run preflight`, which is also what the SessionStart hook warns on.
-- **The rulings quote upstream text.** After an impeccable or emil version bump, re-read
-  `craft-floor.md`, `animate.md`, `operate.md`, and `new-work.md` against rulings 1 through 4
-  and 9 through 10, and re-check the detector rule count in
-  `scripts/detector/registry/antipatterns.mjs` against the three places the arbiter cites it.
+- **There are no npm dependencies.** Since impeccable 4.3.0 the detector, hook, context loader
+  and live server are one Rust binary, fetched and checksum-verified by
+  `skills/impeccable/scripts/impeccable` on first use. Run `npm run preflight` after cloning to
+  confirm the engine answers its handshake; that is also what the SessionStart hook reports on.
+  Do not reintroduce a `dependencies` block without a concrete reason.
+- **The rulings quote upstream text, and upstream moves weekly.** Before trusting any ruling,
+  `git -C .design-sources/<repo> fetch` and check the date; a stale clone is how this project
+  once spent a whole session reasoning about a version that had been superseded for seven weeks.
+  After a version bump, re-read `craft-floor.md`, `animate.md`, `operate.md`, and `new-work.md`
+  against rulings 1 through 4 and 9 through 10, and re-check the rule count in
+  `crates/foundation/src/registry.rs` against the four places the arbiter cites it.
 - **Cite the installed release, not the clone.** `.design-sources/pbakaus-impeccable` tracks
-  main, which runs ahead of the published version vendored here. Ruling 10 carries a version
-  note for exactly this reason.
+  main, which can run ahead of what is vendored here. Ruling 10 carries a version note for
+  exactly this reason.
 - **Never run `npx impeccable install --providers=<other>` in this repo.** It writes a full
   duplicate of the skill tree into a per-provider directory plus a generated context file that
   restates the rulings. Both go stale immediately. Those paths are gitignored; `AGENTS.md` is a

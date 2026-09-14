@@ -15,7 +15,7 @@
  * Contract: never break a session. Always exit 0.
  */
 
-import { preflight, summarize } from '../scripts/preflight.mjs';
+import { preflight } from '../scripts/preflight.mjs';
 
 const CARD = `[design-stack] Design precedence is in effect for any work that creates or changes UI.
 
@@ -44,20 +44,23 @@ PRODUCT.md only. DESIGN.md is written at finish from the built artifact by the
 \`impeccable-documenter\` agent, or by \`/impeccable document\` for an incumbent system. A missing
 DESIGN.md does not mean the project is greenfield.`;
 
-function tierWarning(report) {
-  const { down, allLive } = summarize(report);
-  if (allLive) return '';
-  const needs = [...new Set([...report.staticHtml.needs, ...report.browser.needs])];
-  return `\n\n[design-stack] Detector tiers DOWN: ${down.join(', ')}. The static-HTML engine fails open,`
-    + ` so affected files report zero findings without saying they were skipped. A clean hook result`
-    + ` is not a clean bill of health until this is fixed: run \`npm install\` in the plugin root`
-    + ` (missing: ${needs.join(', ')}).`;
+function engineWarning(report) {
+  if (report.engine.ok && report.engine.matchesPinned) return '';
+  if (!report.engine.ok) {
+    return `\n\n[design-stack] The impeccable engine is not responding: ${report.engine.reason}.`
+      + ` Every detector hook fails until it does, so no design finding this session is`
+      + ` evidence of anything. The launcher downloads engine ${report.pinned || 'the pinned version'}`
+      + ` on first run, which needs network and a writable cache. Tell the user rather than`
+      + ` treating a silent hook as a clean pass.`;
+  }
+  return `\n\n[design-stack] Engine version mismatch: ${report.engine.version} answered, but this`
+    + ` plugin pins ${report.pinned}. Findings may not match the documented rule set.`;
 }
 
 async function main() {
   let warning = '';
   try {
-    warning = tierWarning(await preflight());
+    warning = engineWarning(preflight());
   } catch {
     // Preflight is a convenience. Never let it cost a session its context card.
   }

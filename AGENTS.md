@@ -7,8 +7,8 @@ If you are an agent working *on* this repo, read [CLAUDE.md](CLAUDE.md). It carr
 and the maintenance rules, and it is the single copy.
 
 If you are looking for the design rulings themselves, they are in
-`.claude/skills/design-arbiter/SKILL.md` with the evidence in
-`.claude/skills/design-arbiter/reference/conflicts.md`. Do not restate them anywhere else.
+`skills/design-arbiter/SKILL.md` with the evidence in
+`skills/design-arbiter/reference/conflicts.md`. Do not restate them anywhere else.
 One copy is the point; a second one drifts.
 
 ## Do not run a multi-provider install here
