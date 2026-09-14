@@ -28,7 +28,7 @@ adds a thin arbitration layer that routes between them and rules on the collisio
 ```
 .claude-plugin/
   marketplace.json                 the distribution manifest. this is what makes it installable
-  plugin.json                      declares the skills and the four agents
+  plugin.json                      metadata only. component paths are discovered, not declared
 hooks/
   hooks.json                       SessionStart, PostToolUse, Stop. all ${CLAUDE_PLUGIN_ROOT}
   session-start.mjs                injects the precedence card (~460 tokens) + tier warning
@@ -54,8 +54,9 @@ skills/
 ```
 
 `skills/`, `agents/` and `hooks/hooks.json` sit at the plugin root because that is where Claude
-Code looks. Component discovery is conventional; there is no supported manifest key that points
-at skills elsewhere, so these directories cannot be rearranged.
+Code looks. Discovery is conventional and the manifest declares no paths at all: an explicit
+`agents` array suppressed discovery and loaded zero agents. Verify any layout change with
+`claude plugin details design-stack`, which prints what actually loaded.
 
 The working agreement and the precedence rulings live in `design-arbiter/SKILL.md`, not in
 `CLAUDE.md`. A plugin cannot ship a `CLAUDE.md`, so a compact card is injected at SessionStart

@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "design-stack",
-      "description": "impeccable's 59-rule detector, edit hooks and 23 commands; emil-design-eng's motion and component specs; harvested marketing composition rules; and a design-arbiter skill that routes between them and rules on the 12 conflicts.",
+      "description": "impeccable's 62-rule Rust detector, edit hooks and 23 commands; emil-design-eng's motion and component specs plus the animate procedure; harvested marketing composition rules; and a design-arbiter skill that routes between them and rules on the 14 conflicts.",
       "version": "0.1.0",
       "author": {
         "name": "Bojidar Yovchev"

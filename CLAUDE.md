@@ -36,10 +36,21 @@ package.json          the detector's runtime dependencies
 
 **These paths are load-bearing, not preference.** Claude Code discovers plugin components by
 convention from the plugin root: `skills/<name>/SKILL.md`, `agents/*.md`, `hooks/hooks.json`.
-Anthropic's `plugin-dev` skill documents custom-path keys for `commands`, `agents`, `hooks` and
-`mcpServers` **only**, and none of the 39 plugins in the official marketplace uses one. There is
-no supported way to point at skills somewhere else, so a layout like `.claude/skills/` loads
-nothing. Do not move these directories.
+There is no supported way to point at skills somewhere else, so a layout like `.claude/skills/`
+loads nothing. Do not move these directories.
+
+**Declare no component paths in `plugin.json`.** Anthropic's `plugin-dev` skill says custom
+paths "supplement defaults, they don't replace them". That is not what happens: an explicit
+`"agents": [...]` array suppressed discovery entirely and the plugin loaded **zero** agents,
+even with the files sitting at the conventional path and every listed path resolving. Deleting
+the key loaded all four. None of the 39 plugins in the official marketplace declares a component
+path key. Keep the manifest to metadata only.
+
+**Verify with the real tool, not a hand-rolled one.** `claude plugin validate .` checks the
+manifests, and `claude plugin details design-stack` prints the component inventory and the
+token cost. Both findings above came from that inventory after a homemade validator passed:
+it confirmed the paths existed on disk, which is not the same question as whether the loader
+reads them. Check the inventory after any change to the manifest or the directory layout.
 
 ## Maintenance rules
 
